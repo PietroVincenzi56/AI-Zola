@@ -7,7 +7,6 @@ SEARCH_DEPTH = 2
 
 
 def evaluate_state(game, state, root_player):
-
     """Valuta lo stato dal punto di vista di root_player."""
     winner = game.winner(state)
     if winner == root_player:
@@ -17,32 +16,13 @@ def evaluate_state(game, state, root_player):
     if winner is not None:
         return 0
 
-    score = 0
-
     opponent = game.opponent(root_player)
-    player_powns = state.count(root_player) #numero di pedine del giocatore
-    opp_powns = state.count(opponent)
+    root_count = state.count(root_player)
+    opponent_count = state.count(opponent)
+    root_mobility = len(game._actions_for_player(state, root_player))
+    opponent_mobility = len(game._actions_for_player(state, opponent))
 
-    tot_player_moves = game._actions_for_player(state, root_player)
-    tot_opp_moves = game._actions_for_player(state, opponent)
-
-
-    player_mobility = len(tot_player_moves) #numero di mosse del giocatore
-    opp_mobility = len(tot_opp_moves)
-
-
-    player_captures = 0   
-    opp_captures = 0
-    for i in tot_player_moves:
-        if (i[2]):
-            player_captures += 1
-    for i in tot_opp_moves:
-        if (i[2]):
-            opp_captures += 1
-                    
-
-    return 3 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 2*(player_captures-opp_captures)
-
+    return 3 * (root_count - opponent_count) + (root_mobility - opponent_mobility)
 
 
 def alphabeta(game, state, depth, alpha, beta, maximizing_player, root_player):
@@ -120,29 +100,3 @@ def playerStrategy(game, state, timeout=3):
         state.to_move,
     )
     return best_move
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
