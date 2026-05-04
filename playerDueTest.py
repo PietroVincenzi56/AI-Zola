@@ -5,43 +5,65 @@ import random
 # Profondita di ricerca fissa. Puoi cambiarla senza toccare il resto del file.
 SEARCH_DEPTH = 2
 
-
 def evaluate_state(game, state, root_player):
-
-    """Valuta lo stato dal punto di vista di root_player."""
     winner = game.winner(state)
     if winner == root_player:
-        return 10_000
+        return 10000
     if winner == game.opponent(root_player):
-        return -10_000
+        return -10000
     if winner is not None:
         return 0
 
-    score = 0
-
     opponent = game.opponent(root_player)
-    player_powns = state.count(root_player) #numero di pedine del giocatore
-    opp_powns = state.count(opponent)
 
-    tot_player_moves = game._actions_for_player(state, root_player)
-    tot_opp_moves = game._actions_for_player(state, opponent)
+    # ---- MATERIAL ----
+    player_pawns = state.count(root_player)
+    opp_pawns = state.count(opponent)
 
+    # ---- MOBILITY ----
+    player_moves = game._actions_for_player(state, root_player)
+    opp_moves = game._actions_for_player(state, opponent)
 
-    player_mobility = len(tot_player_moves) #numero di mosse del giocatore
-    opp_mobility = len(tot_opp_moves)
+    player_mobility = len(player_moves)
+    opp_mobility = len(opp_moves)
 
+    # ---- CENTER CONTROL (IMPORTANTISSIMO IN ZOLA) ----
+    player_center = 0
+    opp_center = 0
 
-    player_captures = 0   
-    opp_captures = 0
-    for i in tot_player_moves:
-        if (i[2]):
-            player_captures += 1
-    for i in tot_opp_moves:
-        if (i[2]):
-            opp_captures += 1
-      
+    for r in range(state.size):
+        for c in range(state.size):
+            cell = state.board[r][c]
+            if cell is None:
+                continue
+
+            level = game.get_distance_level(r, c)
+
+            # più vicino al centro = meglio
+            score = (state.size//2 + 1 - level)
+
+            if cell == root_player:
+                player_center += score
+            else:
+                opp_center += score
+
+    # ---- CAPTURE MOVES (leggero peso) ----
+    player_captures = sum(1 for m in player_moves if m[2])
+    opp_captures = sum(1 for m in opp_moves if m[2])
+
+    # ---- FINAL SCORE ----
+  
     
-    return 4 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures)
+    if opp_pawns <4 and player_pawns >= 5:
+        return 13 *(player_pawns - opp_pawns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures) + 0.5*(player_center - opp_center)
+
+  
+    return float(
+    7 * (player_pawns - opp_pawns) +
+    2*(player_mobility - opp_mobility) +
+    0.5*(player_center - opp_center) +
+    1.5 * (player_captures - opp_captures)
+)
     
 
 def alphabeta(game, state, depth, alpha, beta, maximizing_player, root_player):
