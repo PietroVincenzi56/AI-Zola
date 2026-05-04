@@ -11,13 +11,12 @@ def evaluate_state(game, state, root_player):
     """Valuta lo stato dal punto di vista di root_player."""
     winner = game.winner(state)
     if winner == root_player:
-        return 100000
+        return 50000000
     if winner == game.opponent(root_player):
-        return -20000
+        return -50000000
     if winner is not None:
         return 0
 
-    score = 0
 
     opponent = game.opponent(root_player)
     player_powns = state.count(root_player) #numero di pedine del giocatore
@@ -61,11 +60,11 @@ def evaluate_state(game, state, root_player):
     center_score = 0.5 * (player_center_dist - opp_center_dist)
 
 
+    material_advantage = player_powns - opp_powns
+    if opp_powns <4 and player_powns >= 2 or material_advantage >= 2 : #direi di lasciarla cosi
+       return 34 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + player_captures - 3*opp_captures + 0.5*center_score - 2*opp_mobility
 
-    if opp_powns <4 and player_powns >= 3:
-        return 25 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures) + center_score
-
-    return 10 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures) + center_score
+    return 13 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures) + center_score
    
 
 
@@ -76,7 +75,7 @@ def alphabeta(game, state, depth, alpha, beta, maximizing_player, root_player):
 
     best_moves = []
 
-    legal_moves.sort(key=lambda m: m[2], reverse=True)
+    #legal_moves.sort(key=lambda m: m[2], reverse=True)
     #mosse sortate solo sulla base delle catture, da vedere se migliora sorandole per altro
 
     if maximizing_player:
