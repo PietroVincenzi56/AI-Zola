@@ -3,8 +3,8 @@ import random
 
 
 # Profondita di ricerca fissa. Puoi cambiarla senza toccare il resto del file.
-SEARCH_DEPTH = 2
-
+SEARCH_DEPTH = 3
+#va aumentata quando ci sono pochi pezzi, cercare di provre multithread.
 
 def evaluate_state(game, state, root_player):
 
@@ -54,6 +54,9 @@ def alphabeta(game, state, depth, alpha, beta, maximizing_player, root_player):
         return evaluate_state(game, state, root_player), None
 
     best_moves = []
+
+    legal_moves.sort(key=lambda m: m[2], reverse=True)
+    #mosse sortate solo sulla base delle catture, da vedere se migliora sorandole per altro
 
     if maximizing_player:
         value = -math.inf
