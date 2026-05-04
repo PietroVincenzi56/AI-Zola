@@ -11,9 +11,9 @@ def evaluate_state(game, state, root_player):
     """Valuta lo stato dal punto di vista di root_player."""
     winner = game.winner(state)
     if winner == root_player:
-        return 10_000
+        return 20000
     if winner == game.opponent(root_player):
-        return -10_000
+        return -20000
     if winner is not None:
         return 0
 

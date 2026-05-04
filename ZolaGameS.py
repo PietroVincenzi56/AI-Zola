@@ -653,9 +653,9 @@ class ZolaGUI:
 
         if self.player_types[current_player] == "ai":
             if current_player == "Blue":
-                strategy = playerDuemodule.playerStrategy
-            else:
                 strategy = playerPmodule.playerStrategy
+            else:
+                strategy = playerDuemodule.playerStrategy
             future = self.executor.submit(strategy, self.game, state, self.time_out)
             try:
                 move = future.result(timeout=self.time_out)

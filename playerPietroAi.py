@@ -3,7 +3,7 @@ import random
 
 
 # Profondita di ricerca fissa. Puoi cambiarla senza toccare il resto del file.
-SEARCH_DEPTH = 3
+SEARCH_DEPTH = 2
 #va aumentata quando ci sono pochi pezzi, cercare di provre multithread.
 
 def evaluate_state(game, state, root_player):
@@ -11,9 +11,9 @@ def evaluate_state(game, state, root_player):
     """Valuta lo stato dal punto di vista di root_player."""
     winner = game.winner(state)
     if winner == root_player:
-        return 10_000
+        return 100000
     if winner == game.opponent(root_player):
-        return -10_000
+        return -20000
     if winner is not None:
         return 0
 
@@ -41,10 +41,31 @@ def evaluate_state(game, state, root_player):
             opp_captures += 1
 
 
-    if opp_powns == 1 and player_powns >= 2:
-        return 10 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures)
+    # Calcoliamo la distanza accumulata (lower better), penalità per chi è ai bordi
+    player_center_dist = 0
+    opp_center_dist = 0    
+    for r in range(state.size):
+        for c in range(state.size):
+            cell = state.board[r][c]
+            if cell is None: continue
+            
+            # get_distance_level: 0 è il centro, valori alti sono i bordi
+            dist = game.get_distance_level(r, c) #distanza dal centro
+            pos_bonus = max(0, (state.size // 2) - dist)
+            
+            if cell == root_player:
+                player_center_dist += pos_bonus
+            else:
+                opp_center_dist += pos_bonus
 
-    return 4 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures)
+    center_score = 0.5 * (player_center_dist - opp_center_dist)
+
+
+
+    if opp_powns <4 and player_powns >= 3:
+        return 25 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures) + center_score
+
+    return 10 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures) + center_score
    
 
 
