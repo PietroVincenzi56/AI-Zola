@@ -41,7 +41,7 @@ def evaluate_state(game, state, root_player):
             opp_captures += 1
       
     
-    return 2 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + (player_captures-opp_captures)
+    return 4 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures)
     
 
 def alphabeta(game, state, depth, alpha, beta, maximizing_player, root_player):

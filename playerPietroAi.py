@@ -39,11 +39,13 @@ def evaluate_state(game, state, root_player):
     for i in tot_opp_moves:
         if (i[2]):
             opp_captures += 1
-      
-    #if player_powns >= 3:
+
+
+    if opp_powns == 1 and player_powns >= 2:
+        return 10 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures)
+
     return 4 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + 1.5*(player_captures-opp_captures)
-    #else:
-   #     return 10 *(player_powns - opp_powns) + (player_mobility - opp_mobility) + (player_captures-opp_captures)
+   
 
 
 def alphabeta(game, state, depth, alpha, beta, maximizing_player, root_player):
